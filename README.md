@@ -112,6 +112,6 @@ python start_app.py
 如有问题或建议，欢迎通过以下方式联系：
 
 - 项目地址： `https://github.com/acb666/QuantumSpaceWar`
-- 邮箱： 3996870860@qq.com
-qq:3996870860
+- 邮箱： `3996870860@qq.com`
+- QQ：`3996870860`
 享受游戏，探索宇宙！ 🚀🌌
