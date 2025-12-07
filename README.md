@@ -101,6 +101,7 @@ python start_app.py
 - 房间系统 ：支持创建和加入游戏房间
 - 角色系统 ：多种太空主题的游戏角色
 ## 开发和贡献
+@二氧化碳君
 ### 开发流程
 1. Fork本仓库
 2. 创建特性分支 ( git checkout -b feature/AmazingFeature )
@@ -118,5 +119,6 @@ python start_app.py
 如有问题或建议，欢迎通过以下方式联系：
 
 - 项目地址： https://github.com/acb666/QuantumSpaceWar
-- 邮箱： 343046786@qq.com
+- 邮箱： 3996870860@qq.com
+qq:3996870860
 享受游戏，探索宇宙！ 🚀🌌
