@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block title %}登录 - 量子太空杀攻略站{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* 表单动画效果 */
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .form-container {
+        animation: slideIn 0.5s ease-out;
+    }
+    
+    /* 密码可见性切换按钮 */
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #7f8c8d;
+        transition: color 0.3s ease;
+    }
+    
+    .password-toggle:hover {
+        color: #3498db;
+    }
+    
+    /* 按钮悬停效果增强 */
+    .login-btn {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .login-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .login-btn:hover::before {
+        left: 100%;
+    }
+    
+    /* 表单字段容器 */
+    .form-field-container {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* 表单标题装饰 */
+    .form-title {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 2rem;
+    }
+    
+    .form-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, #3498db, #764ba2);
+        border-radius: 2px;
+    }
+    
+    /* 记住密码复选框样式 */
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .form-check-input {
+        width: 16px;
+        height: 16px;
+        accent-color: #3498db;
+        cursor: pointer;
+    }
+    
+    .form-check-label {
+        cursor: pointer;
+        user-select: none;
+        color: #495057;
+    }
+    
+    .form-check-input:checked + .form-check-label {
+        color: #3498db;
+    }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<div style="text-align: center; margin-bottom: 2rem;">
+    <h1>欢迎回到量子太空杀攻略站</h1>
+    <p>登录你的账号，继续你的游戏攻略之旅</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width: 450px; margin: 0 auto;">
+    <div class="card" style="background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);">
+        <h2 class="form-title" style="text-align: center; margin-bottom: 2.5rem;">用户登录</h2>
+        
+        <form method="post" id="loginForm">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="error" style="margin-bottom: 1.5rem; padding: 0.75rem; border-radius: var(--border-radius);">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+            
+            <div class="form-field-container">
+                <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <div class="error">{{ form.username.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-field-container">
+                <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }}</label>
+                <div style="position: relative;">
+                    {{ form.password }}
+                    <span class="password-toggle" onclick="togglePasswordVisibility('{{ form.password.id_for_label }}')">👁️</span>
+                </div>
+                {% if form.password.errors %}
+                    <div class="error">{{ form.password.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-field-container">
+                <div class="form-check" style="margin-bottom: 0.5rem;">
+                    {{ form.remember_me }}
+                    <label class="form-check-label" for="{{ form.remember_me.id_for_label }}" style="font-size: 0.9rem;">
+                        {{ form.remember_me.label }}
+                    </label>
+                </div>
+                {% if form.remember_me.errors %}
+                    <div class="error">{{ form.remember_me.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <a href="#" style="color: #3498db; text-decoration: none; font-size: 0.9rem;">忘记密码？</a>
+            </div>
+            
+            <button type="submit" class="btn btn-primary login-btn" style="width: 100%; padding: 0.75rem; font-size: 1rem;">
+                <span>登录</span>
+            </button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #eee;">
+            <p style="margin-bottom: 0;">
+                还没有账号？ <a href="{% url 'guides:register' %}" style="color: #3498db; text-decoration: none; font-weight: 500;">立即注册</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 表单提交时的加载效果
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<div class="loading"></div> 登录中...';
+        
+        // 模拟表单提交延迟
+        setTimeout(function() {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }, 2000);
+    });
+    
+    // 密码可见性切换功能
+    function togglePasswordVisibility(passwordInputId) {
+        const passwordInput = document.getElementById(passwordInputId);
+        const passwordToggle = passwordInput.nextElementSibling;
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            passwordToggle.textContent = '👁️‍🗨️';
+        } else {
+            passwordInput.type = 'password';
+            passwordToggle.textContent = '👁️';
+        }
+    }
+    
+    // 表单输入验证和反馈
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('input', function() {
+            // 清除所有错误消息
+            document.querySelectorAll('.error').forEach(error => {
+                error.style.display = 'none';
+            });
+            
+            // 添加输入动画效果
+            this.style.transform = 'scale(1.02)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 200);
+        });
+    });
+</script>
+{% endblock %}

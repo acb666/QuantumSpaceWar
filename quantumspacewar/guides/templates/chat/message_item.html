@@ -1,0 +1,11 @@
+{% if message %}
+<div class="message {% if is_current_user %}self{% else %}other{% endif %}" data-message-id="{{ message.id }}">
+    <div class="message-info">
+        <span class="message-sender">{{ message.sender.username }}</span>
+        <span class="message-time">{{ message.created_at|date:'H:i' }}</span>
+    </div>
+    <div class="message-content">
+        {{ message.content|linebreaksbr }}
+    </div>
+</div>
+{% endif %}

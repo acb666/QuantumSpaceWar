@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="量子太空杀攻略站 - 分享游戏战术、技巧和攻略">
+    <meta name="keywords" content="量子太空杀,游戏攻略,战术技巧,游戏指南">
+    <meta name="author" content="量子太空杀攻略站">
+    <title>{% block title %}量子太空杀攻略站{% endblock %}</title>
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+    
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <style>
+        /* 页面加载动画 */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #3498db;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            animation: rotation 1s linear infinite;
+        }
+        
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* 页面滚动进度条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #3498db;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2980b9;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- 页面加载动画 -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader"></div>
+    </div>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="{% url 'guides:home' %}" class="navbar-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path>
+                <path d="M12 3v6m0 6v6m9-9h-6m-6 0H3"></path>
+            </svg>
+            量子太空杀攻略站
+        </a>
+        <div class="navbar-nav">
+            <a href="{% url 'guides:home' %}" class="nav-link">首页</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'guides:chat_room' %}" class="nav-link btn btn-info">聊天室</a>
+                <span class="nav-link">欢迎，{{ user.username }}</span>
+                <a href="{% url 'guides:add_guide' %}" class="nav-link">发布攻略</a>
+                <a href="{% url 'guides:my_guides' %}" class="nav-link">我的攻略</a>
+                {% if user.is_staff %}
+                    <a href="/admin/" class="nav-link btn btn-warning" target="_blank">管理后台</a>
+                {% endif %}
+                <a href="{% url 'guides:logout' %}" class="nav-link btn">退出登录</a>
+            {% else %}
+                <a href="{% url 'guides:login' %}" class="nav-link">登录</a>
+                <a href="{% url 'guides:register' %}" class="btn btn-primary">注册</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <div class="container">
+        <!-- 通知消息 -->
+        {% if messages %}
+            <div class="message-container" style="margin-bottom: 20px;">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="background: none; border: none; font-size: 1.2rem; cursor: pointer;">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <!-- 页面标题区块 -->
+        {% block page_header %}
+        {% endblock %}
+        
+        <!-- 主要内容 -->
+        <main class="content" style="min-height: 60vh;">
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+
+    <!-- 页脚 -->
+    <footer style="margin-top: 40px;">
+        <div class="container">
+            <div class="footer-content" style="display: flex; flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;">
+                <div class="footer-info" style="flex: 1; min-width: 200px; margin-bottom: 20px;">
+                    <h3>量子太空杀攻略站</h3>
+                    <p>用❤️和量子比特构建的游戏攻略社区</p>
+                </div>
+                <div class="footer-stats" style="flex: 1; min-width: 200px; margin-bottom: 20px;">
+                    <p>总攻略数: {{ total_guides|default:"0" }}</p>
+                    <p>活跃用户: {{ active_users|default:"0" }}</p>
+                </div>
+                <div class="footer-links" style="flex: 1; min-width: 200px; margin-bottom: 20px;">
+                    <a href="{% url 'guides:home' %}" style="display: block; margin-bottom: 5px; text-decoration: none; color: white;">首页</a>
+                    <!-- 这些链接将在后续添加对应的视图和URL模式 -->
+                    <!-- <a href="#" style="display: block; margin-bottom: 5px; text-decoration: none; color: white;">关于我们</a> -->
+                    <!-- <a href="#" style="display: block; margin-bottom: 5px; text-decoration: none; color: white;">联系我们</a> -->
+                </div>
+            </div>
+            <div class="footer-copyright">
+                <p>&copy; {% now "Y" %} 量子太空杀攻略站. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 基础JavaScript -->
+    <script>
+        // 页面加载完成后隐藏加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const loader = document.getElementById('pageLoader');
+                if (loader) {
+                    loader.style.opacity = '0';
+                    setTimeout(function() {
+                        loader.style.visibility = 'hidden';
+                    }, 500);
+                }
+            }, 300);
+            
+            // 关闭通知消息
+            document.querySelectorAll('.alert .close').forEach(button => {
+                button.addEventListener('click', function() {
+                    this.parentElement.style.opacity = '0';
+                    setTimeout(() => {
+                        this.parentElement.remove();
+                    }, 300);
+                });
+            });
+            
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

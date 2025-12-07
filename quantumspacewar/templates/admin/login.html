@@ -1,0 +1,55 @@
+{% extends "admin/login.html" %}
+{% load static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/admin.css' %}">
+    <style>
+        /* 确保登录页面样式正确应用 */
+        body.login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #container {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-hover);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 500px !important;
+            width: 90% !important;
+            padding: 2rem;
+            margin-top: 0 !important;
+        }
+    </style>
+{% endblock %}
+
+{% block branding %}
+<div id="site-name" style="text-align: center; margin-bottom: 1.5rem;">
+    <a href="{% url 'admin:index' %}" style="text-decoration: none;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#3498db" stroke-width="2" style="margin-right: 8px; display: inline-block; vertical-align: middle;">
+            <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path>
+            <path d="M12 3v6m0 6v6m9-9h-6m-6 0H3"></path>
+        </svg>
+        <span style="color: #2c3e50; font-size: 1.5rem; font-weight: 600;">量子太空杀攻略站</span>
+    </a>
+</div>
+{% endblock %}
+
+{% block content_title %}
+<h1 style="color: #2c3e50; font-size: 1.25rem; font-weight: 600; text-align: center; margin-bottom: 1.5rem;">管理后台登录</h1>
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+{% endblock %}
+
+{% block footer %}
+<div style="text-align: center; margin-top: 1rem; font-size: 0.9rem; color: #7f8c8d;">
+    <p>© {% now "Y" %} 量子太空杀攻略站</p>
+</div>
+{% endblock %}

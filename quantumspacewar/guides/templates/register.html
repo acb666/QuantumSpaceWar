@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}注册 - 量子太空杀攻略站{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* 表单动画效果 */
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .form-container {
+        animation: slideIn 0.5s ease-out;
+    }
+    
+    /* 输入框聚焦效果 */
+    .form-control:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+    
+    /* 密码可见性切换按钮 */
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #7f8c8d;
+        transition: color 0.3s ease;
+    }
+    
+    .password-toggle:hover {
+        color: #3498db;
+    }
+    
+    /* 按钮悬停效果增强 */
+    .register-btn {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .register-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .register-btn:hover::before {
+        left: 100%;
+    }
+    
+    /* 表单字段容器 */
+    .form-field-container {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* 输入提示信息 */
+    .input-hint {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+        margin-top: 0.25rem;
+    }
+    
+    /* 表单标题装饰 */
+    .form-title {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 2rem;
+    }
+    
+    .form-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, #3498db, #764ba2);
+        border-radius: 2px;
+    }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<div style="text-align: center; margin-bottom: 2rem;">
+    <h1>加入量子太空杀攻略社区</h1>
+    <p>创建账号，开始分享你的游戏攻略和技巧</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width: 500px; margin: 0 auto;">
+    <div class="card" style="background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);">
+        <h2 class="form-title" style="text-align: center; margin-bottom: 2.5rem;">创建账号</h2>
+        
+        <form method="post" id="registerForm">
+            {% csrf_token %}
+            
+            <div class="form-field-container">
+                <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
+                {{ form.username }}
+                <div class="input-hint">用户名长度为3-30个字符</div>
+                {% if form.username.errors %}
+                    <div class="error">{{ form.username.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-field-container">
+                <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                {{ form.email }}
+                <div class="input-hint">请输入有效的电子邮箱地址</div>
+                {% if form.email.errors %}
+                    <div class="error">{{ form.email.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-field-container">
+                <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }}</label>
+                <div style="position: relative;">
+                    {{ form.password }}
+                    <span class="password-toggle" onclick="togglePasswordVisibility('{{ form.password.id_for_label }}')">👁️</span>
+                </div>
+                <div class="input-hint">密码至少包含8个字符，建议使用字母、数字和特殊符号</div>
+                {% if form.password.errors %}
+                    <div class="error">{{ form.password.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-field-container">
+                <label for="{{ form.confirm_password.id_for_label }}" class="form-label">{{ form.confirm_password.label }}</label>
+                <div style="position: relative;">
+                    {{ form.confirm_password }}
+                    <span class="password-toggle" onclick="togglePasswordVisibility('{{ form.confirm_password.id_for_label }}')">👁️</span>
+                </div>
+                {% if form.confirm_password.errors %}
+                    <div class="error">{{ form.confirm_password.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <button type="submit" class="btn btn-primary register-btn" style="width: 100%; padding: 0.75rem; font-size: 1rem;">
+                <span>立即注册</span>
+            </button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #eee;">
+            <p style="margin-bottom: 0;">
+                已有账号？ <a href="{% url 'guides:login' %}" style="color: #3498db; text-decoration: none; font-weight: 500;">立即登录</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 表单提交时的加载效果
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<div class="loading"></div> 注册中...';
+        
+        // 模拟表单提交延迟，实际情况下会在服务器响应后自然处理
+        setTimeout(function() {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }, 2000);
+    });
+    
+    // 密码可见性切换功能
+    function togglePasswordVisibility(passwordInputId) {
+        const passwordInput = document.getElementById(passwordInputId);
+        const passwordToggle = passwordInput.nextElementSibling;
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            passwordToggle.textContent = '👁️‍🗨️';
+        } else {
+            passwordInput.type = 'password';
+            passwordToggle.textContent = '👁️';
+        }
+    }
+    
+    // 表单输入验证和反馈
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('input', function() {
+            const errorDiv = this.parentElement.nextElementSibling;
+            if (errorDiv && errorDiv.classList.contains('error')) {
+                errorDiv.style.display = 'none';
+            }
+            
+            // 添加输入动画效果
+            this.style.transform = 'scale(1.02)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 200);
+        });
+    });
+</script>
+{% endblock %}

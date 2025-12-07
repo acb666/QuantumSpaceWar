@@ -1,0 +1,70 @@
+# Dependencies
+node_modules/
+*.pyc
+__pycache__/
+
+# QuantumSpaceWarApp
+QuantumSpaceWarApp/node_modules/
+QuantumSpaceWarApp/.expo/
+QuantumSpaceWarApp/dist/
+QuantumSpaceWarApp/web-build/
+QuantumSpaceWarApp/expo-env.d.ts
+QuantumSpaceWarApp/.kotlin/
+QuantumSpaceWarApp/*.orig.*
+QuantumSpaceWarApp/*.jks
+QuantumSpaceWarApp/*.p8
+QuantumSpaceWarApp/*.p12
+QuantumSpaceWarApp/*.key
+QuantumSpaceWarApp/*.mobileprovision
+QuantumSpaceWarApp/.metro-health-check*
+QuantumSpaceWarApp/npm-debug.*
+QuantumSpaceWarApp/yarn-debug.*
+QuantumSpaceWarApp/yarn-error.*
+QuantumSpaceWarApp/.DS_Store
+QuantumSpaceWarApp/*.pem
+QuantumSpaceWarApp/.env*.local
+QuantumSpaceWarApp/*.tsbuildinfo
+QuantumSpaceWarApp/ios/
+QuantumSpaceWarApp/android/
+
+# Node Backend
+node-backend/node_modules/
+node-backend/.env
+node-backend/.env.local
+node-backend/.env.*.local
+
+# Django
+quantumspacewar/__pycache__/
+quantumspacewar/venv/
+quantumspacewar/staticfiles/
+quantumspacewar/media/
+quantumspacewar/db.sqlite3
+quantumspacewar/quantumspacewar.log
+
+# Build files
+build/
+dist/
+*.spec
+
+# IDE
+.vs/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local

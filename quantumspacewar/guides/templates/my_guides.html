@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}我的攻略 - 量子太空杀攻略站{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>📚 我的攻略</h1>
+        <p class="subtitle">管理你发布的所有攻略</p>
+    </div>
+
+    <!-- 统计信息 -->
+    <div class="stats-section">
+        <div class="stats-card">
+            <div class="stats-number">{{ page_obj.paginator.count }}</div>
+            <div class="stats-label">总攻略数</div>
+        </div>
+        <div class="stats-card">
+            <div class="stats-number">{{ user.date_joined|date:"Y-m-d" }}</div>
+            <div class="stats-label">加入时间</div>
+        </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="action-buttons">
+        <a href="{% url 'guides:add_guide' %}" class="btn btn-primary">
+            <i class="icon-plus"></i> 发布新攻略
+        </a>
+        <a href="{% url 'guides:home' %}" class="btn btn-secondary">
+            <i class="icon-home"></i> 返回首页
+        </a>
+    </div>
+
+    <!-- 攻略列表 -->
+    {% if page_obj.object_list %}
+        <div class="guides-grid">
+            {% for guide in page_obj.object_list %}
+                <div class="guide-card">
+                    <div class="guide-header">
+                        <h3 class="guide-title">
+                            <a href="{% url 'guides:guide_detail' guide.pk %}">{{ guide.title }}</a>
+                        </h3>
+                        <div class="guide-meta">
+                            <span class="guide-date">{{ guide.created_at|date:"Y-m-d H:i" }}</span>
+                            <span class="guide-views">👁 {{ guide.views }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="guide-content-preview">
+                        {{ guide.content|truncatewords:30 }}
+                    </div>
+                    
+                    <div class="guide-tags">
+                        {% for tag in guide.get_tags_list %}
+                            <span class="tag">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="guide-actions">
+                        <a href="{% url 'guides:guide_detail' guide.pk %}" class="btn btn-small">
+                            <i class="icon-eye"></i> 查看
+                        </a>
+                        <a href="#" class="btn btn-small btn-warning">
+                            <i class="icon-edit"></i> 编辑
+                        </a>
+                        <form method="post" action="{% url 'guides:delete_guide' guide.pk %}" style="display: inline;" 
+                              onsubmit="return confirm('确定要删除攻略《{{ guide.title }}》吗？')">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-small btn-danger">
+                                <i class="icon-trash"></i> 删除
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- 分页 -->
+        {% if page_obj.has_other_pages %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1" class="page-link">首页</a>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="page-link">上一页</a>
+                {% endif %}
+
+                <span class="current-page">
+                    第 {{ page_obj.number }} 页 / 共 {{ page_obj.paginator.num_pages }} 页
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="page-link">下一页</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">末页</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📚</div>
+            <h3>还没有发布攻略</h3>
+            <p>分享你的量子太空杀战术，帮助其他玩家提升技能！</p>
+            <a href="{% url 'guides:add_guide' %}" class="btn btn-primary">
+                <i class="icon-plus"></i> 发布第一个攻略
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+/* 样式代码省略，详见完整文件 */
+</style>
+{% endblock %}

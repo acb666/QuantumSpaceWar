@@ -1,0 +1,15 @@
+{% for message in messages %}
+    {% if message.sender == user %}
+        <div class="message self" data-message-id="{{ message.id }}">
+    {% else %}
+        <div class="message other" data-message-id="{{ message.id }}">
+    {% endif %}
+        <div class="message-info">
+            <span class="message-sender">{{ message.sender.username }}</span>
+            <span class="message-time">{{ message.created_at|date:'H:i' }}</span>
+        </div>
+        <div class="message-content">
+            {{ message.content|linebreaksbr }}
+        </div>
+    </div>
+{% endfor %}

@@ -1,0 +1,550 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}聊天室 - {{ room_name }} - 量子太空杀攻略站{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 200px);
+        max-width: 1200px;
+        margin: 0 auto;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .chat-header {
+        padding: 15px 20px;
+        background: #3498db;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .chat-header h2 {
+        margin: 0;
+        font-size: 1.4rem;
+    }
+    
+    .room-selector {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .room-list {
+        position: relative;
+    }
+    
+    .room-dropdown {
+        min-width: 150px;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background: white;
+        cursor: pointer;
+    }
+    
+    .create-room-btn {
+        background: #27ae60;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    
+    .create-room-btn:hover {
+        background: #219a52;
+    }
+    
+    .main-chat-area {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+    }
+    
+    .rooms-sidebar {
+        width: 250px;
+        background: #f8f9fa;
+        border-right: 1px solid #ddd;
+        overflow-y: auto;
+    }
+    
+    .rooms-sidebar h3 {
+        padding: 15px;
+        margin: 0;
+        font-size: 1.1rem;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .room-item {
+        padding: 12px 15px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+        transition: background 0.3s;
+    }
+    
+    .room-item:hover {
+        background: #e9ecef;
+    }
+    
+    .room-item.active {
+        background: #3498db;
+        color: white;
+    }
+    
+    .message-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    
+    .messages-container {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background: #fafafa;
+    }
+    
+    .message {
+        margin-bottom: 15px;
+        max-width: 70%;
+    }
+    
+    .message-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+    
+    .message-sender {
+        font-weight: bold;
+        margin-right: 10px;
+    }
+    
+    .message-time {
+        font-size: 0.85rem;
+        color: #666;
+    }
+    
+    .message-content {
+        padding: 10px 15px;
+        border-radius: 18px;
+        word-wrap: break-word;
+    }
+    
+    .message.self .message-content {
+        background: #3498db;
+        color: white;
+        margin-left: auto;
+    }
+    
+    .message.other .message-content {
+        background: #e9ecef;
+        color: #333;
+    }
+    
+    .message-form-container {
+        padding: 15px 20px;
+        background: white;
+        border-top: 1px solid #ddd;
+        display: flex;
+        gap: 10px;
+    }
+    
+    .message-input {
+        flex: 1;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 25px;
+        resize: none;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .message-input:focus {
+        outline: none;
+        border-color: #3498db;
+    }
+    
+    .send-btn {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 0 20px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    
+    .send-btn:hover {
+        background: #2980b9;
+    }
+    
+    .send-btn:disabled {
+        background: #95a5a6;
+        cursor: not-allowed;
+    }
+    
+    .no-messages {
+        text-align: center;
+        color: #666;
+        padding: 40px;
+    }
+    
+    .create-room-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+    
+    .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 400px;
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .modal-header h3 {
+        margin: 0;
+    }
+    
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+    
+    .form-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .modal-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    .btn-primary {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    @media (max-width: 768px) {
+        .main-chat-area {
+            flex-direction: column;
+        }
+        
+        .rooms-sidebar {
+            width: 100%;
+            height: auto;
+            max-height: 200px;
+            border-right: none;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .chat-container {
+            height: calc(100vh - 150px);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="chat-header">
+        <h2>聊天室: {{ room_name }}</h2>
+        <div class="room-selector">
+            <button class="create-room-btn" id="showCreateRoom">创建新房间</button>
+        </div>
+    </div>
+    
+    <div class="main-chat-area">
+        <div class="rooms-sidebar">
+            <h3>所有聊天室</h3>
+            {% for room in active_rooms %}
+                <div class="room-item {% if room == room_name %}active{% endif %}" onclick="window.location.href='/chat/{{ room }}/'">
+                    {{ room }}
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="message-area">
+            <div class="messages-container" id="messagesContainer">
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if message.sender == user %}
+                            {% include 'chat/message_item.html' with message=message is_current_user=True %}
+                        {% else %}
+                            {% include 'chat/message_item.html' with message=message is_current_user=False %}
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div class="no-messages">
+                        <p>暂无消息，发送第一条消息开始聊天吧！</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <form class="message-form-container" id="messageForm">
+                <textarea class="message-input" id="messageInput" placeholder="输入消息..." maxlength="500"></textarea>
+                <button type="submit" class="send-btn" id="sendBtn">发送</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 创建聊天室模态框 -->
+<div class="create-room-modal" id="createRoomModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>创建新聊天室</h3>
+            <button class="close-modal" id="closeModal">&times;</button>
+        </div>
+        <form action="{% url 'guides:create_room' %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="roomName">聊天室名称</label>
+                <input type="text" id="roomName" name="room_name" placeholder="输入聊天室名称" required>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" id="cancelCreate">取消</button>
+                <button type="submit" class="btn-primary">创建</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageForm = document.getElementById('messageForm');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const createRoomModal = document.getElementById('createRoomModal');
+        const showCreateRoom = document.getElementById('showCreateRoom');
+        const closeModal = document.getElementById('closeModal');
+        const cancelCreate = document.getElementById('cancelCreate');
+        
+        // 滚动到最新消息的函数
+        function scrollToBottom() {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // 获取当前房间名称
+        let currentRoomName = "{{ room_name }}";
+        // 自动刷新消息（轮询）
+        let lastMessageId = {% if messages %}{{ messages.last.id }}{% else %}0{% endif %};
+        let pollingInterval = null;
+        
+        // 检查消息输入框内容
+        function checkInput() {
+            sendBtn.disabled = !messageInput.value.trim();
+        }
+        
+        messageInput.addEventListener('input', checkInput);
+        checkInput(); // 初始检查
+        
+        // 发送消息
+        messageForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const content = messageInput.value.trim();
+            if (!content) return;
+            
+            // 禁用发送按钮，防止重复发送
+            sendBtn.disabled = true;
+            
+            // 构建基于当前房间的发送消息URL
+            const sendUrl = '/chat/' + encodeURIComponent(currentRoomName) + '/send/';
+            
+            fetch(sendUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': "{{ csrf_token }}",
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'content=' + encodeURIComponent(content)
+            })
+            .then(response => response.text())
+            .then(html => {
+                // 添加新消息到消息容器
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const newMessage = tempDiv.firstElementChild;
+                
+                if (newMessage) {
+                    messagesContainer.appendChild(newMessage);
+                    
+                    // 更新最后消息ID，避免轮询重复获取
+                    const messageId = newMessage.getAttribute('data-message-id');
+                    if (messageId) {
+                        lastMessageId = messageId;
+                    }
+                }
+                
+                // 清空输入框
+                messageInput.value = '';
+                checkInput();
+                
+                // 滚动到最新消息
+                scrollToBottom();
+            })
+            .catch(error => {
+                console.error('发送消息失败:', error);
+                sendBtn.disabled = false;
+            });
+        });
+        
+        // 监听Enter键发送消息，Shift+Enter换行
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                messageForm.dispatchEvent(new Event('submit'));
+            }
+        });
+        
+        function refreshMessages() {
+            // 构建基于当前房间的URL
+            const url = '/chat/' + encodeURIComponent(currentRoomName) + '/get_messages/?last_id=' + lastMessageId;
+            
+            fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                // 检查是否还在同一房间（防止房间切换时的竞态条件）
+                if (currentRoomName !== "{{ room_name }}") {
+                    return; // 如果房间已更改，停止处理这个响应
+                }
+                
+                if (html.trim()) {
+                    // 解析HTML响应
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newMessages = doc.querySelectorAll('.message');
+                    
+                    if (newMessages.length > 0) {
+                        // 添加新消息
+                        newMessages.forEach(message => {
+                            messagesContainer.appendChild(message);
+                        });
+                        
+                        // 更新最后消息ID
+                        const lastIdElement = doc.querySelector('[data-message-id]');
+                        if (lastIdElement) {
+                            lastMessageId = lastIdElement.getAttribute('data-message-id');
+                        }
+                        
+                        // 滚动到最新消息
+                        scrollToBottom();
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('获取消息失败:', error);
+            });
+        }
+        
+        // 使用单一的setInterval进行轮询
+        console.log('开始消息轮询，间隔2000毫秒');
+        pollingInterval = setInterval(refreshMessages, 2000);
+        
+        // 为房间列表项添加点击事件监听，确保在切换房间时清除轮询
+        document.querySelectorAll('.room-item').forEach(function(item) {
+            item.addEventListener('click', function(e) {
+                // 清除当前的轮询
+                if (pollingInterval) {
+                    console.log('切换房间，清除轮询');
+                    clearInterval(pollingInterval);
+                    pollingInterval = null;
+                }
+                // 继续正常导航到新房间
+            });
+        });
+        
+        // 页面卸载时清除轮询，防止内存泄漏
+        window.addEventListener('beforeunload', function() {
+            if (pollingInterval) {
+                console.log('页面卸载，清除轮询');
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+            }
+        });
+        
+        // 模态框控制
+        function toggleModal(show) {
+            createRoomModal.style.display = show ? 'flex' : 'none';
+        }
+        
+        showCreateRoom.addEventListener('click', function() { toggleModal(true); });
+        closeModal.addEventListener('click', function() { toggleModal(false); });
+        cancelCreate.addEventListener('click', function() { toggleModal(false); });
+        
+        // 点击模态框外部关闭
+        createRoomModal.addEventListener('click', function(e) {
+            if (e.target === createRoomModal) {
+                toggleModal(false);
+            }
+        });
+        
+        // ESC键关闭模态框
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && createRoomModal.style.display === 'flex') {
+                toggleModal(false);
+            }
+        });
+    });
+
+</script>
+{% endblock extra_js %}

@@ -1,0 +1,616 @@
+{% extends 'base.html' %}
+
+{% block title %}首页 - 量子太空杀攻略站{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* 动画效果 */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+    }
+    
+    /* 搜索栏样式优化 */
+    .search-container {
+        animation: fadeIn 0.6s ease-out;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .search-form {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        grid-template-rows: auto auto;
+        gap: 1rem;
+        align-items: end;
+    }
+    
+    @media (max-width: 768px) {
+        .search-form {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .search-input-group {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 1rem;
+        align-items: end;
+    }
+    
+    @media (max-width: 576px) {
+        .search-input-group {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .search-input {
+        position: relative;
+    }
+    
+    .search-input input:focus + .search-icon {
+        color: var(--primary-color);
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+        transition: color 0.3s ease;
+    }
+    
+    .search-input input {
+        padding-left: 2.5rem !important;
+    }
+    
+    .search-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    /* 分类筛选样式优化 */
+    .category-filter {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: var(--border-radius);
+        overflow-x: auto;
+    }
+    
+    .category-btn {
+        flex-shrink: 0;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        background: var(--secondary-color);
+        color: white;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .category-btn:hover:not(.active) {
+        background: #5dade2;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .category-btn.active {
+        background: var(--primary-color);
+        box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+    }
+    
+    /* 统计信息样式优化 */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stats-card {
+        background: linear-gradient(135deg, var(--primary-color), #5dade2);
+        color: white;
+        padding: 1.5rem;
+        border-radius: var(--border-radius);
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stats-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .stats-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stats-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    /* 攻略卡片样式优化 */
+    .guide-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .guide-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        animation: fadeIn 0.4s ease-out;
+    }
+    
+    .guide-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary-color);
+    }
+    
+    .guide-title {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+    }
+    
+    .guide-title a {
+        color: #2c3e50;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    .guide-title a:hover {
+        color: var(--primary-color);
+    }
+    
+    .guide-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        color: #7f8c8d;
+    }
+    
+    .guide-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+    
+    .guide-content {
+        margin-bottom: 1rem;
+        line-height: 1.6;
+        color: #34495e;
+    }
+    
+    .guide-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .tag {
+        background: var(--tag-bg-color);
+        color: var(--tag-color);
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .tag:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+    
+    /* 分页样式优化 */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+    }
+    
+    .pagination .btn {
+        min-width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        padding: 0 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .pagination .btn:hover:not(.active) {
+        background: var(--secondary-color);
+        color: white;
+    }
+    
+    .pagination .btn.active {
+        background: var(--primary-color);
+        color: white;
+        font-weight: bold;
+    }
+    
+    /* 空状态样式优化 */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: var(--border-radius);
+        animation: fadeIn 0.6s ease-out;
+    }
+    
+    .empty-state-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+        opacity: 0.6;
+    }
+    
+    .empty-state-title {
+        margin-bottom: 1rem;
+        color: #2c3e50;
+    }
+    
+    .empty-state-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+        margin-top: 2rem;
+    }
+    
+    @media (min-width: 576px) {
+        .empty-state-actions {
+            flex-direction: row;
+        }
+    }
+    
+    /* 响应式调整 */
+    @media (max-width: 768px) {
+        .stats-container {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+        
+        .guide-title {
+            font-size: 1.3rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .stats-number {
+            font-size: 2rem;
+        }
+        
+        .guide-meta {
+            gap: 0.5rem;
+        }
+        
+        .guide-meta-item {
+            font-size: 0.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- 页面标题 -->
+<div style="text-align: center; margin-bottom: 2rem;">
+    <h1 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); margin-bottom: 0.5rem;">量子太空杀攻略站</h1>
+    <p style="color: rgba(255, 255, 255, 0.9);">发现最新、最全面的游戏攻略和战术指南</p>
+</div>
+
+<!-- 搜索栏 -->
+<div class="search-container">
+    <form method="get" class="search-form" id="searchForm">
+        <div class="search-input-group">
+            <div class="search-input">
+                <span class="search-icon">🔍</span>
+                <input type="text" 
+                       name="q" 
+                       id="search" 
+                       class="form-control" 
+                       placeholder="搜索标题、内容或作者..."
+                       value="{{ search_query }}">
+            </div>
+            <div class="form-group">
+                <select name="sort" id="sort" class="form-control">
+                    <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>最新发布</option>
+                    <option value="created_at" {% if sort_by == 'created_at' %}selected{% endif %}>最早发布</option>
+                    <option value="title" {% if sort_by == 'title' %}selected{% endif %}>标题升序</option>
+                    <option value="-title" {% if sort_by == '-title' %}selected{% endif %}>标题降序</option>
+                </select>
+            </div>
+        </div>
+        <div class="search-buttons">
+            <button type="submit" class="btn btn-primary search-btn">
+                <span>🔍 搜索</span>
+            </button>
+            {% if search_query %}
+                <a href="{% url 'guides:home' %}" class="btn btn-secondary reset-btn">
+                    <span>🔄 重置</span>
+                </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- 分类筛选 -->
+<div class="category-filter">
+    <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if sort_by %}sort={{ sort_by }}&{% endif %}" 
+       class="category-btn {% if not request.GET.category %}active{% endif %}">
+        全部
+    </a>
+    <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if sort_by %}sort={{ sort_by }}&{% endif %}category=strategy" 
+       class="category-btn {% if request.GET.category == 'strategy' %}active{% endif %}">
+        战术策略
+    </a>
+    <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if sort_by %}sort={{ sort_by }}&{% endif %}category=guide" 
+       class="category-btn {% if request.GET.category == 'guide' %}active{% endif %}">
+        新手指南
+    </a>
+    <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if sort_by %}sort={{ sort_by }}&{% endif %}category=advanced" 
+       class="category-btn {% if request.GET.category == 'advanced' %}active{% endif %}">
+        高级技巧
+    </a>
+    <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if sort_by %}sort={{ sort_by }}&{% endif %}category=discussion" 
+       class="category-btn {% if request.GET.category == 'discussion' %}active{% endif %}">
+        讨论交流
+    </a>
+</div>
+
+<!-- 统计信息 -->
+<div class="stats-container">
+    <div class="stats-card">
+        <div class="stats-number">{{ total_guides }}</div>
+        <div class="stats-label">总攻略数</div>
+    </div>
+    <div class="stats-card" style="background: linear-gradient(135deg, var(--success-color), #2ecc71);">
+        <div class="stats-number">{{ active_users }}</div>
+        <div class="stats-label">活跃用户</div>
+    </div>
+    <div class="stats-card" style="background: linear-gradient(135deg, var(--warning-color), #f1c40f);">
+        <div class="stats-number">{{ page_obj|length }}</div>
+        <div class="stats-label">当前页攻略</div>
+    </div>
+</div>
+
+<!-- 聊天室功能介绍 -->
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: var(--border-radius); padding: 2rem; margin-bottom: 2rem; color: white; animation: fadeIn 0.8s ease-out; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);">
+    <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">💬</div>
+        <h2 style="margin-top: 0; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">全新聊天室功能</h2>
+        <p style="margin-bottom: 1.5rem; max-width: 600px; opacity: 0.9;">与其他量子指挥官实时交流战术、分享经验、组队开黑！创建专属房间或加入公开讨论，让你的游戏体验更加丰富。</p>
+        {% if user.is_authenticated %}
+            <a href="{% url 'guides:chat_room' %}" class="btn btn-light btn-lg" style="padding: 0.75rem 2rem; font-weight: bold; text-decoration: none; border-radius: 50px; transition: all 0.3s ease;">
+                立即进入聊天室 →
+            </a>
+        {% else %}
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                <a href="{% url 'guides:login' %}" class="btn btn-light" style="padding: 0.75rem 1.5rem; font-weight: bold; text-decoration: none; border-radius: 50px; transition: all 0.3s ease;">
+                    登录后体验
+                </a>
+                <a href="{% url 'guides:register' %}" class="btn btn-dark" style="padding: 0.75rem 1.5rem; font-weight: bold; text-decoration: none; border-radius: 50px; transition: all 0.3s ease;">
+                    注册新账号
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 攻略列表标题 -->
+<h1 style="margin-bottom: 1.5rem; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+    🔥 热门攻略
+</h1>
+
+{% if page_obj %}
+    <div class="guide-list">
+        {% for guide in page_obj %}
+        <div class="guide-card">
+            <h2 class="guide-title">
+                <a href="{{ guide.get_absolute_url }}">{{ guide.title }}</a>
+            </h2>
+            <div class="guide-meta">
+                <span class="guide-meta-item">👤 {{ guide.author.username }}</span>
+                <span class="guide-meta-item">📅 {{ guide.created_at|date:"Y年m月d日 H:i" }}</span>
+                <span class="guide-meta-item">👁️ {{ guide.views }} 浏览</span>
+                <span class="guide-meta-item">🏷️ {{ guide.get_category_display }}</span>
+            </div>
+            <div class="guide-content">
+                {{ guide.content|truncatechars:200 }}
+            </div>
+            {% if guide.get_tags_list %}
+                <div class="guide-tags">
+                    {% for tag in guide.get_tags_list %}
+                        <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if sort_by %}sort={{ sort_by }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}tag={{ tag }}" class="tag">{{ tag }}</a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div style="margin-top: 1rem;">
+                <a href="{{ guide.get_absolute_url }}" class="btn btn-sm btn-outline-primary">
+                    阅读全文 →
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- 分页 -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if sort_by %}sort={{ sort_by }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}page={{ page_obj.previous_page_number }}" 
+               class="btn" aria-label="上一页">
+                ←
+            </a>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <span class="btn active">{{ num }}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if sort_by %}sort={{ sort_by }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}page={{ num }}" 
+                   class="btn">{{ num }}</a>
+            {% elif num == page_obj.number|add:'-4' or num == page_obj.number|add:'4' %}
+                <span class="btn">...</span>
+            {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+            <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if sort_by %}sort={{ sort_by }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}page={{ page_obj.next_page_number }}" 
+               class="btn" aria-label="下一页">
+                →
+            </a>
+        {% endif %}
+    </div>
+    {% endif %}
+{% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <h2 class="empty-state-title">暂无攻略</h2>
+        <p>成为第一个分享攻略的量子指挥官吧！</p>
+        
+        {% if user.is_authenticated %}
+            <div class="empty-state-actions">
+                <a href="{% url 'guides:add_guide' %}" class="btn btn-primary btn-lg">
+                    ✍️ 发布第一条攻略
+                </a>
+            </div>
+        {% else %}
+            <div class="empty-state-actions">
+                <a href="{% url 'guides:login' %}" class="btn btn-primary">
+                    🔐 登录后发布攻略
+                </a>
+                <a href="{% url 'guides:register' %}" class="btn btn-success">
+                    🚀 注册新账号
+                </a>
+            </div>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 搜索表单交互优化
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        const searchBtn = this.querySelector('.search-btn');
+        const originalText = searchBtn.innerHTML;
+        
+        searchBtn.disabled = true;
+        searchBtn.innerHTML = '<div class="loading"></div> 搜索中...';
+        
+        // 表单验证
+        const searchInput = this.querySelector('input[name="q"]');
+        if (!searchInput.value.trim() && !this.querySelector('select[name="sort"]').value) {
+            e.preventDefault();
+            searchBtn.disabled = false;
+            searchBtn.innerHTML = originalText;
+            alert('请输入搜索关键词或选择排序方式');
+            return;
+        }
+    });
+    
+    // 攻略卡片悬停动画
+    document.querySelectorAll('.guide-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.15)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(-3px)';
+            this.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.1)';
+        });
+    });
+    
+    // 统计卡片脉冲动画
+    document.querySelectorAll('.stats-card').forEach((card, index) => {
+        setTimeout(() => {
+            card.style.animation = 'pulse 2s ease infinite';
+        }, index * 300);
+    });
+    
+    // 分类按钮交互
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            // 添加点击反馈动画
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 150);
+        });
+    });
+    
+    // 搜索输入自动完成
+    const searchInput = document.getElementById('search');
+    searchInput.addEventListener('input', function() {
+        // 这里可以添加自动完成逻辑
+        const value = this.value.trim();
+        if (value.length > 2) {
+            // 显示加载指示器
+            const searchIcon = this.parentElement.querySelector('.search-icon');
+            searchIcon.textContent = '⏳';
+            
+            // 模拟搜索延迟
+            setTimeout(() => {
+                searchIcon.textContent = '🔍';
+            }, 500);
+        }
+    });
+    
+    // 平滑滚动到锚点
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+</script>
+{% endblock %}

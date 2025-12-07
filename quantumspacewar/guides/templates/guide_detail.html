@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ guide.title }} - 量子太空杀攻略站{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    <h1>{{ guide.title }}</h1>
+    
+    <div class="guide-meta" style="margin-bottom: 1rem;">
+        <span class="guide-meta-item">👤 {{ guide.author.username }}</span>
+        <span class="guide-meta-item">📅 {{ guide.created_at|date:"Y年m月d日 H:i" }}</span>
+        <span class="guide-meta-item">👁️ {{ guide.views }} 浏览</span>
+        <span class="guide-meta-item">🏷️ {{ guide.get_category_display }}</span>
+    </div>
+    
+    {% if guide.get_tags_list %}
+        <div class="guide-tags" style="margin-bottom: 1rem;">
+            {% for tag in guide.get_tags_list %}
+                <span class="tag">{{ tag }}</span>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <div class="guide-content" style="line-height: 1.6;">
+        {{ guide.content|linebreaks }}
+    </div>
+    
+    <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #eee;">
+        {% if user.is_authenticated and user == guide.author %}
+            <a href="{% url 'guides:delete_guide' guide.pk %}" class="btn" style="background: #e74c3c;" onclick="return confirm('确定要删除这篇攻略吗？')">🗑️ 删除攻略</a>
+        {% endif %}
+        <a href="{% url 'guides:home' %}" class="btn" style="background: #95a5a6;">🔙 返回首页</a>
+    </div>
+</div>
+
+{% if related_guides %}
+    <div class="card" style="max-width: 800px; margin: 2rem auto 0;">
+        <h2>📚 作者的其他攻略</h2>
+        {% for related in related_guides %}
+            <div class="guide-card" style="margin-bottom: 1rem;">
+                <h3 class="guide-title">
+                    <a href="{{ related.get_absolute_url }}">{{ related.title }}</a>
+                </h3>
+                <div class="guide-meta">
+                    <span class="guide-meta-item">📅 {{ related.created_at|date:"Y年m月d日" }}</span>
+                    <span class="guide-meta-item">👁️ {{ related.views }} 浏览</span>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

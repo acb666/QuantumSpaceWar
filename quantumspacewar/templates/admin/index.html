@@ -1,0 +1,135 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/admin.css' %}">
+{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">首页</a>
+{% if title %} &rsaquo; {{ title }}{% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main-wrapper">
+    <div id="content-main">
+        {% if app_list %}
+            {% for app in app_list %}
+                <div class="module" style="background: rgba(38, 50, 56, 0.95); backdrop-filter: blur(10px); border-radius: var(--border-radius); padding: 2rem; margin-bottom: 2rem; box-shadow: var(--shadow); transition: var(--transition); color: var(--text-color);">
+                    <div class="app-{{ app.app_label }} module" style="background: none; padding: 0; border: none; box-shadow: none;">
+                        <table>
+                            <caption>
+                                <a href="{{ app.app_url }}" class="section" style="color: var(--secondary-color); font-size: 1.25rem; font-weight: 600;">
+                                    {{ app.name }}
+                                </a>
+                            </caption>
+                            {% for model in app.models %}
+                                <tr class="model-{{ model.object_name|lower }}" style="transition: var(--transition);">
+                                    {% if model.admin_url %}
+                                        <th scope="row" style="padding: 0.75rem 1rem;">
+                                            <a href="{{ model.admin_url }}" style="color: var(--primary-color); text-decoration: none; transition: var(--transition);">
+                                                {{ model.name }}
+                                            </a>
+                                        </th>
+                                    {% else %}
+                                        <th scope="row" style="padding: 0.75rem 1rem;">
+                                            {{ model.name }}
+                                        </th>
+                                    {% endif %}
+
+                                    {% if model.add_url %}
+                                        <td style="padding: 0.75rem 0.5rem;">
+                                            <a href="{{ model.add_url }}" class="addlink" style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.5rem 1rem; background: var(--success-color); color: white; border-radius: var(--border-radius); text-decoration: none; transition: var(--transition);">
+                                                <span>+</span> 添加
+                                            </a>
+                                        </td>
+                                    {% else %}
+                                        <td style="padding: 0.75rem 0.5rem;">&nbsp;</td>
+                                    {% endif %}
+
+                                    {% if model.admin_url and show_changelinks %}
+                                        {% if model.view_only %}
+                                            <td style="padding: 0.75rem 0.5rem;">
+                                                <a href="{{ model.admin_url }}" class="viewlink" style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.5rem 1rem; background: var(--info-color); color: white; border-radius: var(--border-radius); text-decoration: none; transition: var(--transition);">
+                                                    查看
+                                                </a>
+                                            </td>
+                                        {% else %}
+                                            <td style="padding: 0.75rem 0.5rem;">
+                                                <a href="{{ model.admin_url }}" class="changelink" style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.5rem 1rem; background: var(--primary-color); color: white; border-radius: var(--border-radius); text-decoration: none; transition: var(--transition);">
+                                                    修改
+                                                </a>
+                                            </td>
+                                        {% endif %}
+                                    {% else %}
+                                        <td style="padding: 0.75rem 0.5rem;">&nbsp;</td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>您没有权限编辑任何内容。</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related">
+    <div class="module" id="recent-actions-module" style="background: rgba(38, 50, 56, 0.95); backdrop-filter: blur(10px); border-radius: var(--border-radius); padding: 1.5rem; box-shadow: var(--shadow); color: var(--text-color);">
+        <h2 style="color: var(--primary-color); font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">最近动作</h2>
+          <h3 style="color: var(--secondary-color); font-size: 1rem; font-weight: 500; margin-bottom: 0.75rem;">我的动作</h3>
+            {% load log %}
+            {% get_admin_log 10 as admin_log for_user user %}
+            {% if not admin_log %}
+            <p style="color: var(--text-muted);">暂无记录</p>
+            {% else %}
+            <ul class="actionlist" style="list-style: none; padding: 0; margin: 0;">
+            {% for entry in admin_log %}
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color); transition: var(--transition);">
+                <span class="float-right" style="color: var(--text-muted); font-size: 0.875rem;">{{ entry.action_time|date:"SHORT_DATETIME_FORMAT" }}</span>
+                {% if entry.is_addition %}
+                <span class="addlink" style="color: var(--success-color); font-weight: 500;">+</span>
+                {% elif entry.is_change %}
+                <span class="changelink" style="color: var(--primary-color); font-weight: 500;">~</span>
+                {% elif entry.is_deletion %}
+                <span class="deletelink" style="color: var(--danger-color); font-weight: 500;">✕</span>
+                {% endif %}
+                {% if entry.content_type %}
+                <span class="mini quiet" style="color: var(--text-muted); font-size: 0.875rem;">{{ entry.content_type|capfirst }}:</span>
+                {% else %}
+                <span class="mini quiet" style="color: var(--text-muted); font-size: 0.875rem;">未知内容:</span>
+                {% endif %}
+                {% if entry.is_deletion or not entry.get_admin_url %}
+                    {{ entry.object_repr }}
+                {% else %}
+                    <a href="{{ entry.get_admin_url }}" style="color: var(--secondary-color); text-decoration: none; transition: var(--transition);">
+                        {{ entry.object_repr }}
+                    </a>
+                {% endif %}
+                {% if entry.action_flag != entry.is_deletion %}
+                    {% if entry.change_message %}
+                        <ul class="mini quiet" style="list-style: none; padding: 0; margin: 0.5rem 0 0 1rem; color: var(--text-muted); font-size: 0.875rem;">
+                        {% for line in entry.get_change_message %}
+                            <li>{{ line }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endif %}
+            </li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+    </div>
+</div>
+{% endblock %}
