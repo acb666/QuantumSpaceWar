@@ -17,24 +17,22 @@
 ## 项目结构
 ```
 QuantumSpaceWar/
-├── QuantumSpaceWarApp/     # React Native移
-动端应用
-│   ├── src/               # 源代码
-│   ├── assets/            # 静态资源
-│   └── package.json       # 依赖配置
-├── node-backend/          # Express.js后端
-服务
-│   ├── routes/            # API路由
-│   ├── services/          # 业务逻辑
-│   ├── models/            # 数据模型
-│   └── package.json       # 依赖配置
-├── quantumspacewar/       # Django Web应用
-│   ├── guides/            # 游戏攻略模块
-│   ├── api/               # REST API
-│   └── manage.py          # Django管理脚本
-├── start_app.py           # 项目启动脚本
-├── .gitignore             # Git忽略文件配置
-└── 量子太空杀启动器_修复版.exe # Windows启动器
+├── QuantumSpaceWarApp/     # React Native移动端应用
+│   ├── src/               # 源代码
+│   ├── assets/            # 静态资源
+│   └── package.json       # 依赖配置
+├── node-backend/          # Express.js后端服务
+│   ├── routes/            # API路由
+│   ├── services/          # 业务逻辑
+│   ├── models/            # 数据模型
+│   └── package.json       # 依赖配置
+├── quantumspacewar/       # Django Web应用
+│   ├── guides/            # 游戏攻略模块
+│   ├── api/               # REST API
+│   └── manage.py          # Django管理脚本
+├── start_app.py           # 项目启动脚本
+├── .gitignore             # Git忽略文件配置
+└── 量子太空杀启动器_修复版.exe # Windows启动器
 ```
 ## 安装和运行
 ### 前提条件
@@ -44,54 +42,49 @@ QuantumSpaceWar/
 - Django 3.0+
 ### 安装依赖
 1. 安装React Native应用依赖
-   
-   ```
-   cd QuantumSpaceWarApp
-   npm install
-   ```
+    ```
+    cd QuantumSpaceWarApp
+    npm install
+    ```
 2. 安装Node.js后端依赖
-   
-   ```
-   cd node-backend
-   npm install
-   ```
+    ```
+    cd node-backend
+    npm install
+    ```
 3. 安装Django应用依赖
-   
-   ```
-   cd quantumspacewar
-   pip install -r requirements.txt
-   ```
+    ```
+    cd quantumspacewar
+    pip install -r requirements.txt
+    ```
 ### 运行项目 方法一：使用启动脚本（推荐）
 ```
-# 在项目根目录执行
-python start_app.py
-``` 方法二：手动运行各模块
+# 在项目根目录执行
+python start_app.py
+```
+方法二：手动运行各模块
 1. 启动Node.js后端
-   
-   ```
-   cd node-backend
-   npm start
-   ```
+    ```
+    cd node-backend
+    npm start
+    ```
 2. 启动Django Web应用
-   
-   ```
-   cd quantumspacewar
-   python manage.py runserver
-   ```
+    ```
+    cd quantumspacewar
+    python manage.py runserver
+    ```
 3. 运行React Native应用
-   
-   ```
-   cd QuantumSpaceWarApp
-   # iOS
-   npx react-native run-ios
-   # Android
-   npx react-native run-android
-   ```
+    ```
+    cd QuantumSpaceWarApp
+    # iOS
+    npx react-native run-ios
+    # Android
+    npx react-native run-android
+    ```
 ### Windows启动器
 对于Windows用户，可以直接使用提供的启动器：
 
 ```
-双击运行 "量子太空杀启动器_修复版.exe"
+双击运行 "量子太空杀启动器_修复版.exe"
 ```
 ## 功能特性
 - 跨平台支持 ：同时支持Web、iOS和Android平台
@@ -118,7 +111,7 @@ python start_app.py
 ## 联系方式
 如有问题或建议，欢迎通过以下方式联系：
 
-- 项目地址： https://github.com/acb666/QuantumSpaceWar
+- 项目地址： `https://github.com/acb666/QuantumSpaceWar`
 - 邮箱： 3996870860@qq.com
 qq:3996870860
 享受游戏，探索宇宙！ 🚀🌌
