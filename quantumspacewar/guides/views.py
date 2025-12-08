@@ -209,7 +209,7 @@ def chat_room(request, room_name='general'):
     # 获取最近的聊天消息（最多50条）
     messages = ChatMessage.objects.select_related('sender').filter(
         room_name=room_name
-    ).order_by('-created_at')[:50][::-1]  # 反转顺序，使最新的消息在底部
+    ).order_by('-timestamp')[:50][::-1]  # 反转顺序，使最新的消息在底部
     
     # 获取所有活跃的聊天室
     active_rooms = ChatMessage.objects.values_list('room_name', flat=True).distinct()

@@ -6,7 +6,7 @@
     {% endif %}
         <div class="message-info">
             <span class="message-sender">{{ message.sender.username }}</span>
-            <span class="message-time">{{ message.created_at|date:'H:i' }}</span>
+            <span class="message-time">{{ message.timestamp|date:'H:i' }}</span>
         </div>
         <div class="message-content">
             {{ message.content|linebreaksbr }}
