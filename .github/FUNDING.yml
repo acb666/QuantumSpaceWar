@@ -4,7 +4,7 @@
 github: acb666
 
 # Patreon支持
-patreon: quantumspacewar
+patreon: QuantumSpaceWar
 
 # Open Collective支持
 open_collective: quantumspacewar
@@ -38,7 +38,6 @@ thanks_dev: acb666
 
 # 自定义资金支持链接（中文用户）
 custom:
-  - https://github.com/acb666/QuantumSpaceWar # GitHub项目主页
-  - https://example.com/donate # 捐赠链接示例（可替换为实际链接）
-  - https://afdian.net/a/quantumspacewar # 爱发电支持
-  - https://patreon.com/quantumspacewar # Patreon中文用户支持
+  - `https://github.com/acb666/QuantumSpaceWar`  # GitHub项目主页
+  - `https://afdian.com/a/quantumspacewar`  # 爱发电支持
+  - `https://patreon.com/CO2_just_me`  # Patreon中文用户支持
